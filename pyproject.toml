@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "mictlanxapi"
+version = "0.1.0"
+description = ""
+authors = ["Ignacio Castillo <ignacio.bcastillo@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.114.0"
+motor = "^3.5.1"
+pymongo = "^4.8.0"
+pydantic = "^2.9.1"
+uvicorn = "^0.30.6"
+bcrypt = "^4.2.0"
+option = "^2.1.0"
+pyjwt = "^2.9.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
