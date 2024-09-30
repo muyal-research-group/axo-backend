@@ -1,2 +1,2 @@
 #!/bin/bash
-uvicorn mictlanxapi.server:app --host ${MICTLANX_API_HOST-localhost} --port ${MICTLANX_API_PORT-16666} --reload --log-level debug
+uvicorn axobackend.server:app --host ${AXO_BACKEND_API_HOST-localhost} --port ${AXO_BACKEND_API_PORT-17000} --reload --log-level debug

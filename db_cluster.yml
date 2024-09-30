@@ -5,13 +5,13 @@ services:
     ports:
       - 27017:27017
     networks:
-      - mictlanx
+      - axo
     # environment:
       # MONGO_INITDB_ROOT_USERNAME: root
       # MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - mongo1-db:/data/db
-      - ./mongo-key:/data/key
+        #- ./mongo-key:/data/key
     command: >
       mongod --bind_ip_all --replSet rs0
     restart: unless-stopped
@@ -22,13 +22,13 @@ services:
     ports:
       - 27018:27017
     networks:
-      - mictlanx
+      - axo
     # environment:
       # MONGO_INITDB_ROOT_USERNAME: root
       # MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - mongo2-db:/data/db
-      - ./mongo-key:/data/key
+        #- ./mongo-key:/data/key
     command: >
       mongod --bind_ip_all --replSet rs0
     restart: unless-stopped
@@ -39,13 +39,13 @@ services:
     ports:
       - 27019:27017
     networks:
-      - mictlanx
+      - axo
     # environment:
       # MONGO_INITDB_ROOT_USERNAME: root
       # MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - mongo3-db:/data/db
-      - ./mongo-key:/data/key
+        #- ./mongo-key:/data/key
     command: >
       mongod --bind_ip_all --replSet rs0
     restart: unless-stopped
@@ -53,7 +53,7 @@ services:
 
 
 networks:
-  mictlanx:
+  axo:
 
 volumes:
   mongo1-db:

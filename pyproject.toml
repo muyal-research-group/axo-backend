@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "mictlanxapi"
+name = "axobackend"
 version = "0.1.0"
 description = ""
 authors = ["Ignacio Castillo <ignacio.bcastillo@gmail.com>"]
@@ -16,8 +16,14 @@ uvicorn = "^0.30.6"
 bcrypt = "^4.2.0"
 option = "^2.1.0"
 pyjwt = "^2.9.0"
+humanfriendly = "^10.0"
+python-multipart = "^0.0.9"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+[[tool.poetry.source]]
+name = "test"
+url = "https://test.pypi.org/simple/"
+priority = "supplemental"
