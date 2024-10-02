@@ -14,6 +14,7 @@ from jwt.exceptions import InvalidTokenError
 import axobackend.dto as DtoX
 from fastapi.middleware.cors import CORSMiddleware
 import axobackend.services as ServiceX
+from fastapi.openapi.utils import get_openapi
 
 
 app = FastAPI()
@@ -88,21 +89,21 @@ async def get_current_active_user(
 
 
 
-
-
-
-
 @app.post("/signup")
-async def create_user(create_user_dto: DtoX.CreateUserDTO):
+async def create_user(
+    create_user_dto: DtoX.CreateUserDTO
+):
     result = await users_service.create(create_user_dto=create_user_dto)
-    print("RESULT", result)
+
     if result.is_err:
         error = result.unwrap_err()
         raise HTTPException(status_code=500, detail=str(error))
+    
     return Response(content=None, status_code=204)
 
 
 
+# Auth refactor by Fatima
 @app.post("/auth")
 async def authenticate(authentication_attemp:AuthenticationAttemptModel):
     query = {
@@ -119,7 +120,7 @@ async def authenticate(authentication_attemp:AuthenticationAttemptModel):
     # ________________________________________________________________________________________
     if verified:
         authentication_attemp.status = 1
-        result = authentication_attempt_collection.insert_one(authentication_attemp.model_dump())
+        result = authentication_attempt_collection.insert_one(authentication_attemp.model_dump(by_alias=True, exclude=["authentication_attempt_id"]))
         found_user["_id"] = str(found_user["_id"])
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
@@ -150,3 +151,17 @@ async def validate_token(
 ):
     return Response(content=None, status_code=204)
 
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Axo API",
+        version="1.0.0",
+        description="This is a custom OpenAPI schema",
+        routes=app.routes,
+    )
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi

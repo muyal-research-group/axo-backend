@@ -18,11 +18,20 @@ Deploy the MongoDB Cluster:
 docker compose -f ./db_cluster.yml up -d
 ```
 
+Execute the next command in the mongo1 container: 
+
+```bash
+mongosh
+```
+
+Copy the init_repset.sh content in the mongo1 command line.
+
 Install dependencies :
 
 ```bash
 poetry lock 
 poetry install
+poetry shell
 ```
 
 Run development server:

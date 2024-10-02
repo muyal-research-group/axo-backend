@@ -34,13 +34,14 @@ class UsersRepository:
         except Exception as e:
             return Err(e)
 
-    async def create(self,user:ModelX.UserModel,by_alias:bool = True)->Result[Any,Exception]:
+    async def create(self,user:ModelX.UserModel,by_alias:bool = True)->Result[str,Exception]:
         try:
             user.color = Utils.get_random_hex_color()
-            result = await self.collection.insert_one(user.model_dump(by_alias=by_alias))
-            return Ok(result)
+            result = await self.collection.insert_one(user.model_dump(by_alias=by_alias, exclude=["user_id"]))
+            return Ok(str(result.inserted_id))
         except Exception as e:
             return Err(e)
+
 class CredentialsRepository:
     def __init__(self,
         client: AsyncIOMotorClient,
@@ -57,7 +58,7 @@ class CredentialsRepository:
             return Err(e)
     async def create(self,credentials:ModelX.CredentialsModel,by_alias:bool = True)->Result[InsertOneResult,Exception]:
         try:
-            credentials_dict = credentials.model_dump(by_alias=by_alias)
+            credentials_dict = credentials.model_dump(by_alias=by_alias, exclude=["crendentials_id"])
             credentials_dict["password"] = await hash_value(credentials_dict.get("password",""))
             credentials_dict["pin"] = await hash_value(credentials_dict.get("pin",""))
             credentials_dict["token"] = await hash_value(credentials_dict.get("token",""))
