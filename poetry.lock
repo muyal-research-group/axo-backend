@@ -519,10 +519,5 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 
 [metadata]
 lock-version = "2.0"
-<<<<<<< Updated upstream
 python-versions = "^3.12"
 content-hash = "8795e96618268c698a855bf888239a15b5ebd4f44b9f432a4b5617fa7919f60d"
-=======
-python-versions = "^3.9"
-content-hash = "be2c948569eae09fcac37b041646d2d5145d2dc0ef91f9ce7e0d9ce33f4c554f"
->>>>>>> Stashed changes
