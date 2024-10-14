@@ -15,6 +15,7 @@ import axobackend.dto as DtoX
 from fastapi.middleware.cors import CORSMiddleware
 import axobackend.services as ServiceX
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
 
 
 app = FastAPI()
@@ -108,12 +109,17 @@ async def create_user(
 async def authenticate(
     authentication_attemp:AuthenticationAttemptModel
 ):
-    result = await users_service.login(authentication_attemp=authentication_attemp)
+    try:
+        result = await users_service.login(authentication_attemp=authentication_attemp)
 
-    if result.get("error"):
-        raise HTTPException(status_code=500, detail=result["error"])
+        if isinstance(result, dict) and "error" in result:
+            raise HTTPException(status_code=401, detail=result["error"])
 
-    return Response(content=None, status_code=204)
+        return JSONResponse(content=result, status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")   
+
 
 
 @app.post("/validate-token")
