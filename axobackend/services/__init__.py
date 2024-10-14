@@ -65,6 +65,8 @@ class UsersService(object):
                 last = found_user["last_name"]
                 found_user["initials"] = "{}{}".format(first[0], last[0] ).upper()
                 found_user["fullname"] = "{} {}".format(first,last).lower().title()
+                found_user["_id"] = user_id
+ 
                 return found_user
             # ________________________________________________________________________________________
             authentication_attemp.status = -1
@@ -73,7 +75,7 @@ class UsersService(object):
                 status_code=501,
                 detail="Incorrect username or password."
             )
-                        
+            
         except Exception as e:
             return Err(e)
     
