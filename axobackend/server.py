@@ -105,45 +105,16 @@ async def create_user(
 
 # Auth refactor by Fatima
 @app.post("/auth")
-async def authenticate(authentication_attemp:AuthenticationAttemptModel):
-    query = {
-        "$or": [{"username":authentication_attemp.username }]
-    }
-    found_user = await user_collection.find_one(query)
-    if not found_user:
-        detail="Incorrect username or password."
-        raise HTTPException(status_code=404, detail=detail)
-    user_id                        = str(found_user["_id"])
-    credentials                    = await credentials_collection.find_one({"user_id": user_id  })
-    verified                       = await verify_password(stored_value= credentials.get("password",''), provided_value=authentication_attemp.password)
-    authentication_attemp.password = await hash_value(value=authentication_attemp.password)
-    # ________________________________________________________________________________________
-    if verified:
-        authentication_attemp.status = 1
-        result = authentication_attempt_collection.insert_one(authentication_attemp.model_dump(by_alias=True, exclude=["authentication_attempt_id"]))
-        found_user["_id"] = str(found_user["_id"])
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
-            SECRET_KEY=SECRET_KEY,
-            ALGORITHM=ALGORITHM,
-            data={
-                    "sub": user_id
-            },
-            expires_delta=access_token_expires
-        )
-        found_user["token"] = access_token
-        first = found_user["first_name"]
-        last = found_user["last_name"]
-        found_user["initials"] = "{}{}".format(first[0], last[0] ).upper()
-        found_user["fullname"] = "{} {}".format(first,last).lower().title()
-        return found_user
-    # ________________________________________________________________________________________
-    authentication_attemp.status = -1
-    authentication_attempt_collection.insert_one(authentication_attemp.model_dump())
-    raise HTTPException(
-        status_code=501,
-        detail="Incorrect username or password."
-    )
+async def authenticate(
+    authentication_attemp:AuthenticationAttemptModel
+):
+    result = await users_service.login(authentication_attemp=authentication_attemp)
+
+    if result.get("error"):
+        raise HTTPException(status_code=500, detail=result["error"])
+
+    return Response(content=None, status_code=204)
+
 
 @app.post("/validate-token")
 async def validate_token(
