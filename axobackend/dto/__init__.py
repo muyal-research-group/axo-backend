@@ -18,3 +18,7 @@ class CredentialsDTO(BaseModel):
 class CreateUserDTO(BaseModel):
     user: UserDTO
     credentials:CredentialsDTO
+
+class AuthenticationAttemptDTO(BaseModel):
+    username:str
+    password:str
