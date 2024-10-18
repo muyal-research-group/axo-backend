@@ -12,9 +12,13 @@ class UserDTO(BaseModel):
 
 class CredentialsDTO(BaseModel):
     password: str
-    pin:str
+    pin:Optional[str] =""
     token:Optional[str] =""
 
 class CreateUserDTO(BaseModel):
     user: UserDTO
     credentials:CredentialsDTO
+
+class AuthenticationAttemptDTO(BaseModel):
+    username:str
+    password:str

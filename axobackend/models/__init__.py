@@ -42,7 +42,7 @@ class AuthenticationAttemptModel(BaseModel):
     authentication_attempt_id: Optional[PyObjectId] = Field(default=None, alias='_id')
     username:str
     password:str
-    status:int # -1 - error 0 - default 1 - success 
+    status:Optional[int] = " " # -1 - error 0 - default 1 - success 
     model_config = ConfigDict(
         populate_by_name=True,
         #  json_encoders={ObjectId: str},

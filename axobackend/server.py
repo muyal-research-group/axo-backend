@@ -1,20 +1,19 @@
-from fastapi import FastAPI, HTTPException, Depends,Response,status,Query
+from fastapi import FastAPI, HTTPException, Depends,Response,status
 from fastapi.security import OAuth2PasswordBearer
-from datetime import  timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import FastAPI,Response,HTTPException
 import jwt
 from typing import Annotated
-from axobackend.models import UserModel,AuthenticationAttemptModel
 import axobackend.models as ModelX
 import axobackend.repositories as RepositoryX
 from bson import ObjectId
-from axobackend.security import hash_value,verify_password,create_access_token
 from jwt.exceptions import InvalidTokenError
 import axobackend.dto as DtoX
 from fastapi.middleware.cors import CORSMiddleware
 import axobackend.services as ServiceX
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
+import os
 
 
 app = FastAPI()
@@ -25,9 +24,9 @@ app.add_middleware(
     allow_methods     = ["*"], # Allow all methods (POST, GET, etc.)
     allow_headers     = ["*"], # Allow all headers
 )
-SECRET_KEY                        = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM                         = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES       = 30
+SECRET_KEY                        = os.environ.get("SECRET_KEY","09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
+ALGORITHM                         = os.environ.get("ALGORITHM","HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES       = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES","30"))
 oauth2_scheme                     = OAuth2PasswordBearer(tokenUrl="token")
 MONGO_DETAILS                     = "mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0"
 client                            = AsyncIOMotorClient(MONGO_DETAILS)
@@ -36,6 +35,10 @@ user_collection                   = db.get_collection("users")
 credentials_collection            = db.get_collection("credentials")
 authentication_attempt_collection = db.get_collection("authentitcation_attempt")
 
+authentication_attempt_repository = RepositoryX.AuthenticationAttemptRepository(
+    client=client,
+    collection = authentication_attempt_collection
+)
 credentials_respository           = RepositoryX.CredentialsRepository(
     client     = client,
     collection = credentials_collection
@@ -46,8 +49,9 @@ user_repository                   = RepositoryX.UsersRepository(
 )
 
 users_service = ServiceX.UsersService(
-    credentials_repository = credentials_respository,
-    user_repository        = user_repository
+    credentials_repository            = credentials_respository,
+    user_repository                   = user_repository,
+    authentication_attempt_repository = authentication_attempt_repository
 )
 
 
@@ -70,11 +74,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     if user_result.is_err:
         return credentials_exception
     data = user_result.unwrap()
-    print("DATA", data)
     user = DtoX.UserDTO(**data, user_id= str(data["_id"]))
-    print("USER", user)
-    print("USER_ID", user.user_id)
-    # get_user(fake_users_db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -105,45 +105,21 @@ async def create_user(
 
 # Auth refactor by Fatima
 @app.post("/auth")
-async def authenticate(authentication_attemp:AuthenticationAttemptModel):
-    query = {
-        "$or": [{"username":authentication_attemp.username }]
-    }
-    found_user = await user_collection.find_one(query)
-    if not found_user:
-        detail="Incorrect username or password."
-        raise HTTPException(status_code=404, detail=detail)
-    user_id                        = str(found_user["_id"])
-    credentials                    = await credentials_collection.find_one({"user_id": user_id  })
-    verified                       = await verify_password(stored_value= credentials.get("password",''), provided_value=authentication_attemp.password)
-    authentication_attemp.password = await hash_value(value=authentication_attemp.password)
-    # ________________________________________________________________________________________
-    if verified:
-        authentication_attemp.status = 1
-        result = authentication_attempt_collection.insert_one(authentication_attemp.model_dump(by_alias=True, exclude=["authentication_attempt_id"]))
-        found_user["_id"] = str(found_user["_id"])
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
-            SECRET_KEY=SECRET_KEY,
-            ALGORITHM=ALGORITHM,
-            data={
-                    "sub": user_id
-            },
-            expires_delta=access_token_expires
-        )
-        found_user["token"] = access_token
-        first = found_user["first_name"]
-        last = found_user["last_name"]
-        found_user["initials"] = "{}{}".format(first[0], last[0] ).upper()
-        found_user["fullname"] = "{} {}".format(first,last).lower().title()
-        return found_user
-    # ________________________________________________________________________________________
-    authentication_attemp.status = -1
-    authentication_attempt_collection.insert_one(authentication_attemp.model_dump())
-    raise HTTPException(
-        status_code=501,
-        detail="Incorrect username or password."
-    )
+async def authenticate(
+    authentication_attemp:DtoX.AuthenticationAttemptDTO
+):
+    try:
+        result = await users_service.login(authentication_attemp=authentication_attemp)
+        print("RESULT",result)
+        if result.is_err:
+            raise HTTPException(status_code=500, detail=str(result.unwrap_err()))
+
+        return JSONResponse(content=result.unwrap(), status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))   
+
+
 
 @app.post("/validate-token")
 async def validate_token(

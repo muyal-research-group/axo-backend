@@ -9,6 +9,8 @@
 </div>   
 
 # Axo - Backend
+The Axo Backend is the core system for a platform designed to allow users to manage active objects dynamically and efficiently. This backend service provides comprehensive REST API to handle all business logic, and database interactions related to active object creation, modification, and retrieval.
+
 
 # Getting started
 
@@ -42,4 +44,9 @@ Run development server:
 
 Now you can perform operation request on 17000 port.
 
+## Test 🧪
+Run the tests: Once everything is installed, you can run the tests using pytest with the following command:
 
+```
+pytest ./test/test_users.py
+```
