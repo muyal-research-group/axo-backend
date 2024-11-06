@@ -99,7 +99,8 @@ class AxoObjectModel(BaseModel):
 
 class CodeModel(BaseModel):
     code_id: Optional[PyObjectId] = Field(default=None, alias='_id')
-    axo_id: str  
+    axo_id: str
+    user_id: str  
     code: str
     created_at: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc))
     user_id: str
@@ -110,7 +111,8 @@ class CodeModel(BaseModel):
 
 class ResultModel(BaseModel):
     result_id: Optional[PyObjectId] = Field(default=None, alias='_id')
-    axos_id: str  
+    axos_id: str
+    user_id: str  
     hash: str
     created_at: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc))
     model_config = ConfigDict(
@@ -123,6 +125,7 @@ class TaskModel(BaseModel):
     axos_id: str  
     source_bucket_id: str
     sink_bucket_id: str
+    user_id: str
     created_at: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc))
     model_config = ConfigDict(
         populate_by_name=True,
