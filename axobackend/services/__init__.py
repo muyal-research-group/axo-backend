@@ -50,6 +50,10 @@ class UsersService(object):
                 return Err(Exception(detail))
             found_user = found_user_result.unwrap()
             print("FOUND_FOUSer", found_user)
+            if not found_user:
+                detail = "User not found."
+                return Err(Exception(detail))
+
             user_id                        = str(found_user["_id"])
             credentials_result                    = await self.credentials_repository.find_one({"user_id": user_id  })
             if credentials_result.is_err:
