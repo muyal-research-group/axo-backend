@@ -25,7 +25,7 @@ class AxoObjectsService(object):
                 if "user_id" in axo_object and isinstance(axo_object["user_id"], ObjectId):
                     axo_object["user_id"] = str(axo_object["user_id"])
                 if "code_id" in axo_object and isinstance(axo_object["code_id"], ObjectId):
-                    axo_object["code_id"] = str
+                    axo_object["code_id"] = str(axo_object["code_id"])
                     
             return Ok(axo_objects)
 
