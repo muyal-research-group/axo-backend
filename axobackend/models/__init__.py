@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field,BeforeValidator,ConfigDict
 from typing import List, Optional,Dict,Any,Annotated
-from bson import ObjectId
 from datetime import datetime, timezone
 
 class Token(BaseModel):

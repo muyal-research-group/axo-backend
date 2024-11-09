@@ -1,10 +1,28 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from axobackend.routers import auth, virtual_environments, endpoints, axo, axos, tasks, results, code
+from axobackend.controllers import auth, axoobjects, axoshadows, virtual_environments, endpoints, tasks, results, code
+import axobackend.db as DbX
 
+from dotenv import load_dotenv
+import os 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    ENV_FILE = os.environ.get("ENV_FILE","")
+    if ENV_FILE != "" and os.path.exists(ENV_FILE):
+        load_dotenv(ENV_FILE)
+    await DbX.connect_to_mongo()
+    yield 
+    await DbX.close_mongo_connection()
+
+    
+
+app = FastAPI(
+    lifespan= lifespan
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,8 +49,8 @@ app.openapi = custom_openapi
 app.include_router(auth.auth_router)
 app.include_router(virtual_environments.environments_router)
 app.include_router(endpoints.endpoints_router)
-app.include_router(axo.axo_router)
-app.include_router(axos.axos_router)
+app.include_router(axoobjects.axo_router)
+app.include_router(axoshadows.axos_router)
 app.include_router(tasks.tasks_router)
 app.include_router(results.results_router)
 app.include_router(code.code_router)
