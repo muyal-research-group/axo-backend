@@ -1,17 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
+from axobackend.dependencies import get_current_active_user
 import axobackend.dto as DtoX
-import axobackend.repositories.TasksRepository as TasksRepository
-import axobackend.services.TasksServices as TasksServices
-from ..dependencies import get_current_user, get_current_active_user
-from ..config import client, tasks_collection 
+import axobackend.repositories as RepositoryX
+import axobackend.services as ServiceX
+import axobackend.db as DbX
 
-tasks_repository                  = TasksRepository.TasksRepository(
-    client     = client,
-    collection = tasks_collection
-)
-tasks_service = TasksServices.TasksService(
-    tasks_repository                  = tasks_repository
-)
+VIRTUAL_ENVIRONMENT_COLLECTION = "virtual_environments"
+
+def get_service()->ServiceX.VirtualEnvironmentsService:
+    collection = DbX.get_collection(name=VIRTUAL_ENVIRONMENT_COLLECTION)
+    repository = RepositoryX.VirtualEnvironmentRepository(collection= collection)
+    service    = ServiceX.VirtualEnvironmentsService(repository= repository)
+    return service
 
 
 tasks_router = APIRouter(
@@ -22,8 +22,10 @@ tasks_router = APIRouter(
 
 @tasks_router.get("")
 async def get_user_tasks(
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    tasks_service:ServiceX.TasksService = Depends(get_service)
 ):
+
     try:
         result = await tasks_service.get_user_tasks(current_user.user_id)
         if result.is_ok:
@@ -37,7 +39,8 @@ async def get_user_tasks(
 @tasks_router.get("/{task_id}")
 async def get_tasks(
     task_id: str, 
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    tasks_service:ServiceX.TasksService = Depends(get_service)
 ):
     try:
         result = await tasks_service.get_task(task_id, current_user.user_id)
@@ -59,7 +62,8 @@ async def get_tasks(
 @tasks_router.post("")
 async def create_tasks(
     create_tasks: DtoX.CreateTaskDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    tasks_service:ServiceX.TasksService = Depends(get_service)
 ):
     result = await tasks_service.create_task(create_tasks, current_user.user_id)
     if result.is_ok:
@@ -73,7 +77,8 @@ async def create_tasks(
 async def update_task(
     task_id: str,
     update_tasks: DtoX.UpdateTaskDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    tasks_service:ServiceX.TasksService = Depends(get_service)
 ):
     result = await tasks_service.update_task(task_id, current_user.user_id, update_tasks)
     if result.is_ok:
@@ -88,7 +93,8 @@ async def update_task(
 @tasks_router.delete("/{task_id}")
 async def delete_task(
     task_id: str,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    tasks_service:ServiceX.TasksService = Depends(get_service)
 ):
     result = await tasks_service.delete_task(task_id, current_user.user_id)
     if result.is_ok:

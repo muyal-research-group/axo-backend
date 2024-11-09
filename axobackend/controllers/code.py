@@ -1,17 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 import axobackend.dto as DtoX
-import axobackend.repositories.CodeRepository as CodeRepository
-import axobackend.services.CodeServices as CodeServices
-from ..dependencies import get_current_user, get_current_active_user
-from ..config import client, code_collection
+import axobackend.repositories as RepositoryX
+import axobackend.services as ServiceX
+import axobackend.db as DbX
+from  axobackend.dependencies import get_current_active_user
 
-code_repository                  = CodeRepository.CodeRepository(
-    client     = client,
-    collection = code_collection
-)
-code_service = CodeServices.CodeService(
-    code_repository                   = code_repository
-)
+
+CODE_COLLECTION = "codes"
+
+def get_service()->ServiceX.CodeService:
+    collection = DbX.get_collection(name=CODE_COLLECTION)
+    repository = RepositoryX.CodeRepository(collection= collection)
+    service    = ServiceX.CodeService(repository= repository)
+    return service
 
 
 code_router = APIRouter(
@@ -22,7 +23,8 @@ code_router = APIRouter(
 
 @code_router.get("")
 async def get_user_code(
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     try:
         result = await code_service.get_user_code(current_user.user_id)
@@ -37,7 +39,8 @@ async def get_user_code(
 @code_router.get("/{code_id}")
 async def get_code(
     code_id: str, 
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     try:
         result = await code_service.get_code(code_id, current_user.user_id)
@@ -59,7 +62,8 @@ async def get_code(
 @code_router.post("")
 async def create_code(
     create_code: DtoX.CreateCodeDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await code_service.create_code(create_code, current_user.user_id)
     if result.is_ok:
@@ -73,7 +77,8 @@ async def create_code(
 async def update_code(
     code_id: str,
     update_code: DtoX.UpdateCodeDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await code_service.update_code(code_id, current_user.user_id, update_code)
     if result.is_ok:
@@ -88,7 +93,8 @@ async def update_code(
 @code_router.delete("/{code_id}")
 async def delete_code(
     code_id: str,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await code_service.delete_code(code_id, current_user.user_id)
     if result.is_ok:

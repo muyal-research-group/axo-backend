@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 import axobackend.dto as DtoX
-import axobackend.repositories.VirtualEnvironmentRepository as VirtualEnvironmentRepository
-import axobackend.services.VirtualEnvironmentsService as VirtualEnvironmentsService
-from ..dependencies import get_current_user, get_current_active_user
-from ..config import client, envs_collection
+import axobackend.repositories as RepositoryX
+import axobackend.services as ServiceX
+from axobackend.dependencies import  get_current_active_user
+import axobackend.db as DbX
+# from ..config import client, envs_collection
 
-env_repository                    = VirtualEnvironmentRepository.VirtualEnvironmentRepository(
-    client     = client,
-    collection = envs_collection
-)
-env_service = VirtualEnvironmentsService.VirtualEnvironmentsService(
-    env_repository                   = env_repository
-)
+VIRTUAL_ENVIRONMENT_COLLECTION = "virtual_environments"
 
+def get_service()->ServiceX.VirtualEnvironmentsService:
+    collection = DbX.get_collection(name=VIRTUAL_ENVIRONMENT_COLLECTION)
+    repository = RepositoryX.VirtualEnvironmentRepository(collection= collection)
+    service    = ServiceX.VirtualEnvironmentsService(repository= repository)
+    return service
 
 environments_router = APIRouter(
     prefix="/virtual-environments",
@@ -22,7 +22,8 @@ environments_router = APIRouter(
 
 @environments_router.get("")
 async def get_user_environments(
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    env_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     try:
         result = await env_service.get_user_environments(current_user.user_id)
@@ -37,7 +38,8 @@ async def get_user_environments(
 @environments_router.get("/{ve_id}")
 async def get_environment(
     ve_id: str, 
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user), 
+    env_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     try:
         result = await env_service.get_environment(ve_id, current_user.user_id)
@@ -55,7 +57,8 @@ async def get_environment(
 @environments_router.post("")
 async def create_environment(
     create_env_dto: DtoX.CreateVirtualEnvironmentDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    env_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await env_service.create_environment(create_env_dto, current_user.user_id)
     if result.is_ok:
@@ -69,7 +72,8 @@ async def create_environment(
 async def update_environment(
     ve_id: str,
     update_env_dto: DtoX.UpdateVirtualEnvironmentDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    env_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await env_service.update_environment(ve_id, current_user.user_id, update_env_dto)
     if result.is_ok:
@@ -84,7 +88,8 @@ async def update_environment(
 @environments_router.delete("/{ve_id}")
 async def delete_environment(
     ve_id: str,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    env_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await env_service.delete_environment(ve_id, current_user.user_id)
     if result.is_ok:

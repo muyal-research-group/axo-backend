@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 import axobackend.dto as DtoX
-import axobackend.repositories.EndpointsRepository as EndpointsRepository
-import axobackend.services.EndpointsServices as EndpointsServices
-from ..dependencies import get_current_user, get_current_active_user
-from ..config import client, endpoint_collection
+import axobackend.repositories as RepositoryX
+import axobackend.services as ServiceX
+import axobackend.db as DbX
+from axobackend.dependencies import get_current_active_user
 
-endpoint_repository               = EndpointsRepository.EndpointsRepository(
-    client     = client,
-    collection = endpoint_collection
-)
-endpoint_service = EndpointsServices.EndpointsService(
-    endpoint_repository               = endpoint_repository
-)
 
+ENDPOINTS_COLLECTION = "endpoints"
+
+def get_service()->ServiceX.EndpointsService:
+    collection = DbX.get_collection(name=ENDPOINTS_COLLECTION)
+    repository = RepositoryX.EndpointsRepository(collection= collection)
+    service    = ServiceX.EndpointsService(repository= repository)
+    return service
 
 endpoints_router = APIRouter(
     prefix="/endpoints",
@@ -22,7 +22,8 @@ endpoints_router = APIRouter(
 
 @endpoints_router.get("")
 async def get_user_endpoints(
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    endpoint_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     try:
         result = await endpoint_service.get_user_endpoints(current_user.user_id)
@@ -37,7 +38,8 @@ async def get_user_endpoints(
 @endpoints_router.get("/{e_id}")
 async def get_endpoint(
     e_id: str, 
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    endpoint_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     try:
         result = await endpoint_service.get_endpoint(e_id, current_user.user_id)
@@ -59,7 +61,8 @@ async def get_endpoint(
 @endpoints_router.post("")
 async def create_endpoint(
     create_endpoint: DtoX.CreateEndpointDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    endpoint_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await endpoint_service.create_endpoint(create_endpoint, current_user.user_id)
     if result.is_ok:
@@ -73,7 +76,8 @@ async def create_endpoint(
 async def update_endpoint(
     e_id: str,
     update_endpoint: DtoX.UpdateEndpointDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    endpoint_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await endpoint_service.update_endpoint(e_id, current_user.user_id, update_endpoint)
     if result.is_ok:
@@ -88,7 +92,8 @@ async def update_endpoint(
 @endpoints_router.delete("/{e_id}")
 async def delete_endpoint(
     e_id: str,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    endpoint_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await endpoint_service.delete_endpoint(e_id, current_user.user_id)
     if result.is_ok:
