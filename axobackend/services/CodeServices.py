@@ -1,5 +1,4 @@
 import axobackend.repositories  as RepositoryX
-import axobackend.repositories.CodeRepository as CodeRepository
 import axobackend.models as ModelX
 import axobackend.dto as DtoX
 from option import Result,Ok,Err
@@ -9,13 +8,13 @@ from bson import ObjectId
 #Code Service        
 class CodeService(object):
     def __init__(self, 
-        code_repository: CodeRepository.CodeRepository
+        repository: RepositoryX.CodeRepository
     ):
-        self.code_repository        = code_repository
+        self.repository        = repository
     
     async def get_user_code(self, user_id:str)->Result[List[Dict[str, Any]], Exception]:
         try:
-            result = await self.code_repository.find_by_user_id(user_id)
+            result = await self.repository.find_by_user_id(user_id)
             if result.is_err:
                 return result
             codes = result.unwrap()
@@ -39,7 +38,7 @@ class CodeService(object):
                 "user_id": ObjectId(user_id)
             }
             
-            result = await self.code_repository.find_one(query)
+            result = await self.repository.find_one(query)
             
             if result.is_err:
                 return result
@@ -67,7 +66,7 @@ class CodeService(object):
                 created_at= create_code.created_at
             )
             
-            result = await self.code_repository.create(code)
+            result = await self.repository.create(code)
             
             if result.is_err:
                 return result
@@ -90,7 +89,7 @@ class CodeService(object):
 
             update_data = update_code.model_dump(exclude_unset=True)
             
-            result = await self.code_repository.update(code_id, user_id, update_data)
+            result = await self.repository.update(code_id, user_id, update_data)
             
             if result.is_err:
                 return result
@@ -107,7 +106,7 @@ class CodeService(object):
             if exists_result.is_err:
                 return exists_result
             
-            result = await self.code_repository.delete(code_id, user_id)
+            result = await self.repository.delete(code_id, user_id)
             
             if result.is_err:
             

@@ -1,5 +1,4 @@
 import axobackend.repositories  as RepositoryX
-import axobackend.repositories.ResultsRepository as ResultsRepository
 import axobackend.models as ModelX
 import axobackend.dto as DtoX
 from option import Result,Ok,Err
@@ -9,13 +8,13 @@ from bson import ObjectId
 #Results Service        
 class ResultsService(object):
     def __init__(self, 
-        results_repository: ResultsRepository.ResultsRepository
+        repository: RepositoryX.ResultsRepository
     ):
-        self.results_repository        = results_repository
+        self.repository        = repository
     
     async def get_user_results(self, user_id: str) -> Result[List[Dict[str, Any]], Exception]:
         try:
-            result = await self.results_repository.find_by_user_id(user_id)
+            result = await self.repository.find_by_user_id(user_id)
             if result.is_err:
                 return result
             results = result.unwrap()
@@ -39,7 +38,7 @@ class ResultsService(object):
                 "_id": ObjectId(result_id),
                 "user_id": ObjectId(user_id)
             }
-            result = await self.results_repository.find_one(query)
+            result = await self.repository.find_one(query)
             
             if result.is_err:
                 return result
@@ -67,7 +66,7 @@ class ResultsService(object):
                 created_at= create_result.created_at
             )
             
-            result = await self.results_repository.create(res)
+            result = await self.repository.create(res)
             
             if result.is_err:
                 return result
@@ -90,7 +89,7 @@ class ResultsService(object):
 
             update_data = update_result.model_dump(exclude_unset=True)
             
-            result = await self.results_repository.update(result_id, user_id, update_data)
+            result = await self.repository.update(result_id, user_id, update_data)
             
             if result.is_err:
                 return result
@@ -107,7 +106,7 @@ class ResultsService(object):
             if exists_result.is_err:
                 return exists_result
             
-            result = await self.results_repository.delete(result_id, user_id)
+            result = await self.repository.delete(result_id, user_id)
             
             if result.is_err:
             

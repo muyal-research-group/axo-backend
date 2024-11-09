@@ -1,5 +1,4 @@
 import axobackend.repositories  as RepositoryX
-import axobackend.repositories.TasksRepository as TasksRepository
 import axobackend.models as ModelX
 import axobackend.dto as DtoX
 from option import Result,Ok,Err
@@ -9,13 +8,13 @@ from bson import ObjectId
 #Tasks Service        
 class TasksService(object):
     def __init__(self, 
-        tasks_repository: TasksRepository.TasksRepository
+        repository: RepositoryX.TasksRepository
     ):
-        self.tasks_repository        = tasks_repository
+        self.repository        = repository
     
     async def get_user_tasks(self, user_id:str)->Result[List[Dict[str, Any]], Exception]:
         try:
-            result = await self.tasks_repository.find_by_user_id(user_id)
+            result = await self.repository.find_by_user_id(user_id)
             if result.is_err:
                 return result
             tasks = result.unwrap()
@@ -43,7 +42,7 @@ class TasksService(object):
                 "user_id": ObjectId(user_id)
             }
             
-            result = await self.tasks_repository.find_one(query)
+            result = await self.repository.find_one(query)
             
             if result.is_err:
                 return result
@@ -75,7 +74,7 @@ class TasksService(object):
                 created_at= create_task.created_at
             )
             
-            result = await self.tasks_repository.create(task)
+            result = await self.repository.create(task)
             
             if result.is_err:
                 return result
@@ -98,7 +97,7 @@ class TasksService(object):
 
             update_data = update_task.model_dump(exclude_unset=True)
             
-            result = await self.tasks_repository.update(task_id, user_id, update_data)
+            result = await self.repository.update(task_id, user_id, update_data)
             
             if result.is_err:
                 return result
@@ -115,7 +114,7 @@ class TasksService(object):
             if exists_result.is_err:
                 return exists_result
             
-            result = await self.tasks_repository.delete(task_id, user_id)
+            result = await self.repository.delete(task_id, user_id)
             
             if result.is_err:
             

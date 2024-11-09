@@ -1,5 +1,4 @@
 import axobackend.repositories  as RepositoryX
-import axobackend.repositories.AxoObjectsRepository as AxoObjectsRepository
 import axobackend.models as ModelX
 import axobackend.dto as DtoX
 from option import Result,Ok,Err
@@ -9,13 +8,13 @@ from bson import ObjectId
 #Axo Service        
 class AxoObjectsService(object):
     def __init__(self, 
-        axo_repository: AxoObjectsRepository.AxoObjectsRepository
+        repository: RepositoryX.AxoObjectsRepository
     ):
-        self.axo_repository        = axo_repository
+        self.repository        = repository
     
     async def get_user_axo(self, user_id: str) -> Result[List[Dict[str, Any]], Exception]:
         try:
-            result = await self.axo_repository.find_by_user_id(user_id)
+            result = await self.repository.find_by_user_id(user_id)
             if result.is_err:
                 return result
             axo_objects = result.unwrap()
@@ -39,7 +38,7 @@ class AxoObjectsService(object):
                 "user_id": ObjectId(user_id)
             }
             
-            result = await self.axo_repository.find_one(query)
+            result = await self.repository.find_one(query)
             
             if result.is_err:
                 return result
@@ -66,7 +65,7 @@ class AxoObjectsService(object):
                 created_at= create_axo.created_at
             )
             
-            result = await self.axo_repository.create(axo_object)
+            result = await self.repository.create(axo_object)
             
             if result.is_err:
                 return result
@@ -89,7 +88,7 @@ class AxoObjectsService(object):
 
             update_data = update_axo.model_dump(exclude_unset=True)
             
-            result = await self.axo_repository.update(axo_id, user_id, update_data)
+            result = await self.repository.update(axo_id, user_id, update_data)
             
             if result.is_err:
                 return result
@@ -106,7 +105,7 @@ class AxoObjectsService(object):
             if exists_result.is_err:
                 return exists_result
             
-            result = await self.axo_repository.delete(axo_id, user_id)
+            result = await self.repository.delete(axo_id, user_id)
             
             if result.is_err:
             

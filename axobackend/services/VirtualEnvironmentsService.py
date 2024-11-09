@@ -1,23 +1,20 @@
-import axobackend.repositories  as RepositoryX
-import axobackend.repositories.VirtualEnvironmentRepository as VirtualEnvironmentRepository
+import axobackend.repositories as RepositoryX
 import axobackend.models as ModelX
 import axobackend.dto as DtoX
 from option import Result, Ok, Err
-from fastapi import Depends
-from typing import Dict, Any, List, Optional, Annotated
+from typing import Dict, Any, List
 from bson import ObjectId
-
 #VirtualEnviroment Service        
 class VirtualEnvironmentsService(object):
     def __init__(self, 
-        env_repository: VirtualEnvironmentRepository.VirtualEnvironmentRepository,
+        repository: RepositoryX.VirtualEnvironmentRepository,
     ):
-        self.env_repository        = env_repository
+        self.repository        = repository
     
     async def get_user_environments(self, user_id: str)->Result[List[Dict[str, Any]], Exception]:
 
         try:
-            result = await self.env_repository.find_by_user_id(user_id)
+            result = await self.repository.find_by_user_id(user_id)
             
             if result.is_err:
                 return result
@@ -40,7 +37,7 @@ class VirtualEnvironmentsService(object):
                 "user_id": ObjectId(user_id)
             }
             
-            result = await self.env_repository.find_one(query)
+            result = await self.repository.find_one(query)
             
             if result.is_err:
                 return result
@@ -68,7 +65,7 @@ class VirtualEnvironmentsService(object):
                 created_at= create_env_dto.created_at
             )
             
-            result = await self.env_repository.create(virtual_env)
+            result = await self.repository.create(virtual_env)
             
             if result.is_err:
                 return result
@@ -92,7 +89,7 @@ class VirtualEnvironmentsService(object):
 
             update_data = update_env_dto.model_dump(exclude_unset=True)
             
-            result = await self.env_repository.update(ve_id, user_id, update_data)
+            result = await self.repository.update(ve_id, user_id, update_data)
             
             if result.is_err:
                 return result
@@ -109,7 +106,7 @@ class VirtualEnvironmentsService(object):
             if exists_result.is_err:
                 return exists_result
             
-            result = await self.env_repository.delete(ve_id, user_id)
+            result = await self.repository.delete(ve_id, user_id)
             
             if result.is_err:
             
