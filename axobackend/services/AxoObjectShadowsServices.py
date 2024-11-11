@@ -1,21 +1,20 @@
 import axobackend.repositories  as RepositoryX
-import axobackend.repositories.AxoObjectShadowsRepository as AxoObjectShadowsRepository
 import axobackend.models as ModelX
 import axobackend.dto as DtoX
 from option import Result,Ok,Err
-from typing import Dict,Any,List,Optional
+from typing import Dict,Any,List
 from bson import ObjectId
 
 #Axos Service        
 class AxoObjectShadowsService(object):
     def __init__(self, 
-        axos_repository: AxoObjectShadowsRepository.AxoObjectShadowsRepository,
+        repository: RepositoryX.AxoObjectShadowsRepository,
     ):
-        self.axos_repository        = axos_repository
+        self.repository        = repository
     
     async def get_user_axos(self, user_id: str) -> Result[List[Dict[str, Any]], Exception]:
         try:
-            result = await self.axos_repository.find_by_user_id(user_id)
+            result = await self.repository.find_by_user_id(user_id)
             if result.is_err:
                 return result
             axos = result.unwrap()
@@ -43,7 +42,7 @@ class AxoObjectShadowsService(object):
                 "user_id": ObjectId(user_id)
             }
             
-            result = await self.axos_repository.find_one(query)
+            result = await self.repository.find_one(query)
             
             if result.is_err:
                 return result
@@ -74,7 +73,7 @@ class AxoObjectShadowsService(object):
                 created_at= create_axos.created_at
             )
             
-            result = await self.axos_repository.create(axos)
+            result = await self.repository.create(axos)
             
             if result.is_err:
                 return result
@@ -97,7 +96,7 @@ class AxoObjectShadowsService(object):
 
             update_data = update_axos.model_dump(exclude_unset=True)
             
-            result = await self.axos_repository.update(axos_id, user_id, update_data)
+            result = await self.repository.update(axos_id, user_id, update_data)
             
             if result.is_err:
                 return result
@@ -114,7 +113,7 @@ class AxoObjectShadowsService(object):
             if exists_result.is_err:
                 return exists_result
             
-            result = await self.axos_repository.delete(axos_id, user_id)
+            result = await self.repository.delete(axos_id, user_id)
             
             if result.is_err:
             

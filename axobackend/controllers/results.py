@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 import axobackend.dto as DtoX
-import axobackend.repositories.ResultsRepository as ResultsRepository
-import axobackend.services.ResultsServices as ResultsServices
-from ..dependencies import get_current_user, get_current_active_user
-from ..config import client, results_collection
+import axobackend.repositories as RepositoryX
+import axobackend.services as ServiceX
+import axobackend.db as DbX
+from axobackend.dependencies import get_current_active_user
 
-results_repository                = ResultsRepository.ResultsRepository(
-    client     = client,
-    collection = results_collection
-)
-results_service = ResultsServices.ResultsService(
-    results_repository                = results_repository,
-)
 
+VIRTUAL_ENVIRONMENT_COLLECTION = "results"
+
+def get_service()->ServiceX.ResultsService:
+    collection = DbX.get_collection(name=VIRTUAL_ENVIRONMENT_COLLECTION)
+    repository = RepositoryX.ResultsRepository(collection= collection)
+    service    = ServiceX.ResultsService(repository= repository)
+    return service
 
 results_router = APIRouter(
     prefix="/results",
@@ -22,7 +22,8 @@ results_router = APIRouter(
 
 @results_router.get("")
 async def get_user_results(
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    results_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     try:
         result = await results_service.get_user_results(current_user.user_id)
@@ -37,7 +38,8 @@ async def get_user_results(
 @results_router.get("/{result_id}")
 async def get_result(
     result_id: str, 
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    results_service:ServiceX.ResultsService = Depends(get_service)
 ):
     try:
         result = await results_service.get_result(result_id, current_user.user_id)
@@ -59,7 +61,8 @@ async def get_result(
 @results_router.post("")
 async def create_result(
     create_result: DtoX.CreateResultDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    results_service:ServiceX.ResultsService = Depends(get_service)
 ):
     result = await results_service.create_result(create_result, current_user.user_id)
     if result.is_ok:
@@ -73,7 +76,8 @@ async def create_result(
 async def update_result(
     result_id: str,
     update_result: DtoX.UpdateResultDTO,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    results_service:ServiceX.ResultsService = Depends(get_service)
 ):
     result = await results_service.update_result(result_id, current_user.user_id, update_result)
     if result.is_ok:
@@ -88,7 +92,8 @@ async def update_result(
 @results_router.delete("/{result_id}")
 async def delete_result(
     result_id: str,
-    current_user: DtoX.UserDTO = Depends(get_current_active_user)
+    current_user: DtoX.UserDTO = Depends(get_current_active_user),
+    results_service:ServiceX.ResultsService = Depends(get_service)
 ):
     result = await results_service.delete_result(result_id, current_user.user_id)
     if result.is_ok:

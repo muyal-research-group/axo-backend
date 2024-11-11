@@ -1,5 +1,4 @@
 import axobackend.repositories  as RepositoryX
-import axobackend.repositories.EndpointsRepository as EndpointsRepository
 import axobackend.models as ModelX
 import axobackend.dto as DtoX
 from option import Result,Ok,Err
@@ -9,13 +8,13 @@ from bson import ObjectId
 #Endpoints Service        
 class EndpointsService(object):
     def __init__(self, 
-        endpoint_repository: EndpointsRepository.EndpointsRepository,
+        repository: RepositoryX.EndpointsRepository,
     ):
-        self.endpoint_repository        = endpoint_repository
+        self.repository        = repository
     
     async def get_user_endpoints(self, user_id:str)->Result[List[Dict[str, Any]], Exception]:
         try:
-            result = await self.endpoint_repository.find_by_user_id(user_id)
+            result = await self.repository.find_by_user_id(user_id)
             if result.is_err:
                 return result
             endpoints = result.unwrap()
@@ -39,7 +38,7 @@ class EndpointsService(object):
                 "user_id": ObjectId(user_id)
             }
             
-            result = await self.endpoint_repository.find_one(query)
+            result = await self.repository.find_one(query)
             
             if result.is_err:
                 return result
@@ -68,7 +67,7 @@ class EndpointsService(object):
                 created_at= create_endpoint.created_at
             )
             
-            result = await self.endpoint_repository.create(endpoint)
+            result = await self.repository.create(endpoint)
             
             if result.is_err:
                 return result
@@ -91,7 +90,7 @@ class EndpointsService(object):
 
             update_data = update_endpoint.model_dump(exclude_unset=True)
             
-            result = await self.endpoint_repository.update(e_id, user_id, update_data)
+            result = await self.repository.update(e_id, user_id, update_data)
             
             if result.is_err:
                 return result
@@ -108,7 +107,7 @@ class EndpointsService(object):
             if exists_result.is_err:
                 return exists_result
             
-            result = await self.endpoint_repository.delete(e_id, user_id)
+            result = await self.repository.delete(e_id, user_id)
             
             if result.is_err:
             
