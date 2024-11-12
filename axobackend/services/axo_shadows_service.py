@@ -6,9 +6,9 @@ from typing import Dict,Any,List
 from bson import ObjectId
 
 #Axos Service        
-class AxoObjectShadowsService(object):
+class AxoShadowsService(object):
     def __init__(self, 
-        repository: RepositoryX.AxoObjectShadowsRepository,
+        repository: RepositoryX.AxoShadowsRepository,
     ):
         self.repository        = repository
     

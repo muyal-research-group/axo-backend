@@ -2,24 +2,23 @@ import unittest as U
 import requests as R
 from tests.get_token import get_token
 
-class ResultsTestCase(U.TestCase):
+class ResultsTest(U.TestCase):
     BASE_URL = "http://localhost:17000/results"
     result_id = None
 
-    @classmethod
-    def setUp(cls):
-        cls.token = get_token()
-        cls.headers = {
-            'Authorization': f'Bearer {cls.token}',
+    def setUp(self):
+        self.token = get_token()
+        self.headers = {
+            'Authorization': f'Bearer {self.token}',
             'Content-Type': 'application/json'
         }
-        if not cls.result_id:
-            response = R.post(cls.BASE_URL, headers=cls.headers, json={
+        if not self.result_id:
+            response = R.post(self.BASE_URL, headers=self.headers, json={
                 "axos_id": "",
                 "hash": ""
             })
             if response.status_code == 200:
-                cls.result_id = response.json().get('result_id')
+                self.result_id = response.json().get('result_id')
 
     def test_0_create_result(self):
         response = R.post(self.BASE_URL, headers=self.headers, json={

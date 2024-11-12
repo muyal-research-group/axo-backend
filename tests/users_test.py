@@ -1,46 +1,42 @@
 import unittest as U
 import requests as R
 
-class AxoBackendTestCase(U.TestCase):
-    token = None
+class UsersTest(U.TestCase):
 
-    @staticmethod
-    def _post_request(url, json_data=None, headers=None):
+    def _post_request(self, url, json_data=None, headers=None):
         try:
             response = R.post(url, json=json_data, headers=headers)
             response.raise_for_status()
             return response
         except R.exceptions.RequestException as e:
-            print(f"Error en la solicitud: {e}")
+            print(f"Error in request: {e}")
             raise
 
-    def test_login(self):
+    def _get_token(self):
         response = self._post_request("http://localhost:17000/auth", json_data={
             "username": "prueba1", 
             "password": "hola123",
             "grant_type": "password"
         })
-
         token_data = response.json()
-        self.assertIn("token", token_data)
-        AxoBackendTestCase.token = token_data["token"]
-        self.assertIsNotNone(AxoBackendTestCase.token)
+        return token_data.get("token")
+
+    def test_login(self):
+        token = self._get_token()
+        self.assertIsNotNone(token, "Failed to get token")
 
     def test_validate_token(self):
-        if not AxoBackendTestCase.token:
-            self.fail("Token no obtenido, ejecutar 'test_login' primero")
-
+        token = self._get_token() 
         response = self._post_request("http://localhost:17000/auth/validate-token", headers={
-            "Authorization": f"Bearer {AxoBackendTestCase.token}"
+            "Authorization": f"Bearer {token}"
         })
-
         self.assertIn(response.status_code, [200, 204])
 
     def test_register_user(self):
         user_data = {
             "user": {
-                "username": "newuser",
-                "email": "newuser@gmail.com",
+                "username": "fatima20",
+                "email": "fatima20@gmail.com",
                 "first_name": "prueba",
                 "last_name": "register"
             },
