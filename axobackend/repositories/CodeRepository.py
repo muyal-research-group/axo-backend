@@ -11,10 +11,8 @@ from option import Result,Ok,Err
 class CodeRepository:
     def __init__(
         self, 
-        client: AsyncIOMotorClient, 
         collection: AsyncIOMotorCollection
     ):
-        self.client = client
         self.collection = collection
     
     async def find_one(self, query: Dict[str, Any] = {}) -> Result[Dict[str, Any], Exception]:

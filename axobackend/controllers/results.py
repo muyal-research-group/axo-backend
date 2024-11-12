@@ -6,10 +6,10 @@ import axobackend.db as DbX
 from axobackend.dependencies import get_current_active_user
 
 
-VIRTUAL_ENVIRONMENT_COLLECTION = "results"
+RESULT_COLLECTION = "results"
 
 def get_service()->ServiceX.ResultsService:
-    collection = DbX.get_collection(name=VIRTUAL_ENVIRONMENT_COLLECTION)
+    collection = DbX.get_collection(name=RESULT_COLLECTION)
     repository = RepositoryX.ResultsRepository(collection= collection)
     service    = ServiceX.ResultsService(repository= repository)
     return service
@@ -23,7 +23,7 @@ results_router = APIRouter(
 @results_router.get("")
 async def get_user_results(
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    results_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
+    results_service:ServiceX.ResultsService = Depends(get_service)
 ):
     try:
         result = await results_service.get_user_results(current_user.user_id)

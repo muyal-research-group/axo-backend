@@ -63,7 +63,7 @@ async def create_environment(
     result = await env_service.create_environment(create_env_dto, current_user.user_id)
     if result.is_ok:
         ve_id = result.unwrap()
-        return {"ve_id": ve_id}
+        return {"ve_id": ve_id}, 201
     else:
         raise HTTPException(status_code=500, detail=str(result.unwrap_err()))
 

@@ -24,7 +24,7 @@ code_router = APIRouter(
 @code_router.get("")
 async def get_user_code(
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
+    code_service:ServiceX.CodeService = Depends(get_service)
 ):
     try:
         result = await code_service.get_user_code(current_user.user_id)
@@ -40,7 +40,7 @@ async def get_user_code(
 async def get_code(
     code_id: str, 
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
+    code_service:ServiceX.CodeService = Depends(get_service)
 ):
     try:
         result = await code_service.get_code(code_id, current_user.user_id)
@@ -63,7 +63,7 @@ async def get_code(
 async def create_code(
     create_code: DtoX.CreateCodeDTO,
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
+    code_service:ServiceX.CodeService = Depends(get_service)
 ):
     result = await code_service.create_code(create_code, current_user.user_id)
     if result.is_ok:
@@ -78,7 +78,7 @@ async def update_code(
     code_id: str,
     update_code: DtoX.UpdateCodeDTO,
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
+    code_service:ServiceX.CodeService = Depends(get_service)
 ):
     result = await code_service.update_code(code_id, current_user.user_id, update_code)
     if result.is_ok:
@@ -94,7 +94,7 @@ async def update_code(
 async def delete_code(
     code_id: str,
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    code_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
+    code_service:ServiceX.CodeService = Depends(get_service)
 ):
     result = await code_service.delete_code(code_id, current_user.user_id)
     if result.is_ok:
