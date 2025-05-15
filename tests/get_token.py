@@ -3,7 +3,7 @@ import requests
 
 def get_token():
     response = requests.post("http://localhost:17000/auth", json={
-        'username': 'prueba1',
+        'username': 'fatima20',
         'password': 'hola123'
     })
     if response.status_code != 200:

@@ -12,19 +12,23 @@ class UsersTest(U.TestCase):
             print(f"Error in request: {e}")
             raise
 
+    # @U.skip("")
     def _get_token(self):
         response = self._post_request("http://localhost:17000/auth", json_data={
-            "username": "prueba1", 
+            "username": "fatima20", 
             "password": "hola123",
             "grant_type": "password"
         })
         token_data = response.json()
         return token_data.get("token")
 
+    # @U.skip("")
     def test_login(self):
         token = self._get_token()
+        print(token)
         self.assertIsNotNone(token, "Failed to get token")
 
+    # @U.skip("")
     def test_validate_token(self):
         token = self._get_token() 
         response = self._post_request("http://localhost:17000/auth/validate-token", headers={
@@ -32,6 +36,7 @@ class UsersTest(U.TestCase):
         })
         self.assertIn(response.status_code, [200, 204])
 
+    @U.skip("YOU MUST EXECUTE THIS TEST FIRST.")
     def test_register_user(self):
         user_data = {
             "user": {

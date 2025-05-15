@@ -6,7 +6,6 @@ The Axo Backend is the core system for a platform designed to allow users to man
 ---
 
 ## 🛠️ Architecture
-
 The following diagram represents the architecture of the backend system:
 
 <p align="center">
@@ -58,7 +57,7 @@ cd axo-backend
 ```
 ### Step 2: Deploy the MongoDB cluster
 ```bash
-docker compose -f ./db_cluster.yml up -d
+docker compose -f ./db/db_cluster.yml up -d
 ```
 
 Execute the next command in the mongo1 container: 
@@ -67,7 +66,7 @@ Execute the next command in the mongo1 container:
 mongosh
 ```
 
-Then, copy the contents of init_repset.sh into the MongoDB command line to initialize the replica set.
+Then, copy the contents of scripts/init_repset.sh into the MongoDB command line to initialize the replica set.
 
 ### Step 3: Install dependencies
 
