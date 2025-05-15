@@ -8,10 +8,10 @@ from  axobackend.dependencies import  get_current_active_user
 
 AXO_SHADOW_COLLECTION = "axo_shadows"
 
-def get_service()->ServiceX.AxoObjectShadowsService:
+def get_service()->ServiceX.AxoShadowsService:
     collection = DbX.get_collection(name=AXO_SHADOW_COLLECTION)
-    repository = RepositoryX.AxoObjectShadowsRepository(collection= collection)
-    service    = ServiceX.AxoObjectShadowsService(repository= repository)
+    repository = RepositoryX.AxoShadowsRepository(collection= collection)
+    service    = ServiceX.AxoShadowsService(repository= repository)
     return service
 
 
@@ -24,7 +24,7 @@ axos_router = APIRouter(
 @axos_router.get("")
 async def get_user_axos(
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    axos_service:ServiceX.AxoObjectShadowsService = Depends(get_service)
+    axos_service:ServiceX.AxoShadowsService = Depends(get_service)
 ):
     try:
         result = await axos_service.get_user_axos(current_user.user_id)
@@ -40,7 +40,7 @@ async def get_user_axos(
 async def get_axos(
     axos_id: str, 
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    axos_service:ServiceX.AxoObjectShadowsService = Depends(get_service)
+    axos_service:ServiceX.AxoShadowsService = Depends(get_service)
 ):
     try:
         result = await axos_service.get_axo_object_shadow(axos_id, current_user.user_id)
@@ -63,7 +63,7 @@ async def get_axos(
 async def create_axos(
     create_axos: DtoX.CreateAxoObjectShadowDTO,
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    axos_service:ServiceX.AxoObjectShadowsService = Depends(get_service)
+    axos_service:ServiceX.AxoShadowsService = Depends(get_service)
 ):
     result = await axos_service.create_axos(create_axos, current_user.user_id)
     if result.is_ok:
@@ -78,7 +78,7 @@ async def update_axos(
     axos_id: str,
     update_axos: DtoX.UpdateAxoObjectShadowDTO,
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    axos_service:ServiceX.AxoObjectShadowsService = Depends(get_service)
+    axos_service:ServiceX.AxoShadowsService = Depends(get_service)
 ):
     result = await axos_service.update_axos(axos_id, current_user.user_id, update_axos)
     if result.is_ok:
@@ -94,7 +94,7 @@ async def update_axos(
 async def delete_axos(
     axos_id: str,
     current_user: DtoX.UserDTO = Depends(get_current_active_user),
-    axos_service:ServiceX.AxoObjectShadowsService = Depends(get_service)
+    axos_service:ServiceX.AxoShadowsService = Depends(get_service)
 ):
     result = await axos_service.delete_axos(axos_id, current_user.user_id)
     if result.is_ok:

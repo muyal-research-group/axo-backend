@@ -1,10 +1,10 @@
-from axobackend.services.AxoObjectShadowsServices import AxoObjectShadowsService
-from axobackend.services.AxoObjectsServices import AxoObjectsService
-from axobackend.services.CodeServices import CodeService
-from axobackend.services.EndpointsServices import EndpointsService
-from axobackend.services.ResultsServices import ResultsService
-from axobackend.services.TasksServices import TasksService
-from axobackend.services.UsersService import UsersService
-from axobackend.services.VirtualEnvironmentsService import VirtualEnvironmentsService
+from axobackend.services.axo_shadows_service import AxoShadowsService
+from axobackend.services.axo_objects_service import AxoObjectsService
+from axobackend.services.code_service import CodeService
+from axobackend.services.endpoints_service import EndpointsService
+from axobackend.services.results_service import ResultsService
+from axobackend.services.tasks_service import TasksService
+from axobackend.services.users_service import UsersService
+from axobackend.services.environments_service import VirtualEnvironmentsService
 
 

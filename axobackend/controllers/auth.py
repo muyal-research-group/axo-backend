@@ -45,6 +45,7 @@ async def create_user(
     users_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     result = await users_service.create(create_user_dto=create_user_dto)
+    print(result)
     if result.is_err:
         error = result.unwrap_err()
         raise HTTPException(status_code=500, detail=str(error))
@@ -57,7 +58,9 @@ async def authenticate(
     users_service:ServiceX.VirtualEnvironmentsService = Depends(get_service)
 ):
     try:
+        print(authentication_attemp)
         result = await users_service.login(authentication_attemp=authentication_attemp)
+        print(result)
         if result.is_err:
             raise HTTPException(status_code=500, detail=str(result.unwrap_err()))
         return JSONResponse(content=result.unwrap(), status_code=200)

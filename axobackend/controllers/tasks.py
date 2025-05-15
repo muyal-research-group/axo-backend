@@ -5,12 +5,12 @@ import axobackend.repositories as RepositoryX
 import axobackend.services as ServiceX
 import axobackend.db as DbX
 
-VIRTUAL_ENVIRONMENT_COLLECTION = "virtual_environments"
+TASK_COLLECTION = "tasks"
 
-def get_service()->ServiceX.VirtualEnvironmentsService:
-    collection = DbX.get_collection(name=VIRTUAL_ENVIRONMENT_COLLECTION)
-    repository = RepositoryX.VirtualEnvironmentRepository(collection= collection)
-    service    = ServiceX.VirtualEnvironmentsService(repository= repository)
+def get_service()->ServiceX.TasksService:
+    collection = DbX.get_collection(name=TASK_COLLECTION)
+    repository = RepositoryX.TasksRepository(collection= collection)
+    service    = ServiceX.TasksService(repository= repository)
     return service
 
 
@@ -53,7 +53,7 @@ async def get_tasks(
             error = result.unwrap_err()
             
             if isinstance(error, ValueError):
-                raise HTTPException(status_code=404, detail="result not found")
+                raise HTTPException(status_code=404, detail="Task not found")
             raise HTTPException(status_code=500, detail=str(error))
     except Exception as e:
         raise HTTPException(status_code=403, detail=str(e))
@@ -68,7 +68,7 @@ async def create_tasks(
     result = await tasks_service.create_task(create_tasks, current_user.user_id)
     if result.is_ok:
         task_id = result.unwrap()
-        return {"result_id": task_id}
+        return {"task_id": task_id}
     else:
         raise HTTPException(status_code=500, detail=str(result.unwrap_err()))
     
