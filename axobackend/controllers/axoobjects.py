@@ -3,7 +3,7 @@ import axobackend.dto as DtoX
 import axobackend.db as DbX
 import axobackend.repositories as RepositoryX
 import axobackend.services as ServiceX
-from axobackend.dependencies import get_current_user, get_current_active_user
+from axobackend.dependencies import get_current_user_id, get_current_active_user
 
 AXO_OBJECT_COLLECTION = "axo_objects"
 
