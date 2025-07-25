@@ -47,10 +47,13 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 app.include_router(auth.auth_router)
+
+
 app.include_router(virtual_environments.environments_router)
 app.include_router(endpoints.endpoints_router)
 app.include_router(axoobjects.axo_router)
 app.include_router(axoshadows.axos_router)
 app.include_router(tasks.tasks_router)
 app.include_router(results.results_router)
+
 app.include_router(code.code_router)

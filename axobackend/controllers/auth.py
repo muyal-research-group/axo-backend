@@ -6,7 +6,7 @@ import axobackend.services as ServiceX
 import axobackend.repositories as RepositoryX
 import axobackend.db as DbX
 
-from axobackend.dependencies import get_current_user, get_current_active_user
+from axobackend.dependencies import get_current_user_id, get_current_active_user
 
 USER_COLLECTION = "users"
 CREDENTIALS_COLLECTION = "credentials"
